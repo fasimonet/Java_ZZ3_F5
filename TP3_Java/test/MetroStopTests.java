@@ -1,12 +1,11 @@
 import junit.framework.TestCase;
 import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class MetroStopTests extends TestCase {
-    @Test
+
     public void testListSortedById() {
         ArrayList<MetroStop> stops = new ArrayList<>();
         MetroStop ms1 = new MetroStop(3, 11.111111, 22.222222, "Jaude", "Clermont-Ferrand", "tramway");
@@ -24,7 +23,6 @@ public class MetroStopTests extends TestCase {
         Assert.assertEquals(2, stops.indexOf(ms1));
     }
 
-    @Test
     public void testListSortedByDistrictAndThenByStationName() {
         ArrayList<MetroStop> stops = new ArrayList<>();
         MetroStop ms1 = new MetroStop(3, 11.111111, 22.222222, "Jaude", "Clermont-Ferrand", "tramway");

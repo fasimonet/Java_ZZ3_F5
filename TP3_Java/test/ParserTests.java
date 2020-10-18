@@ -20,11 +20,14 @@ public class ParserTests extends TestCase {
     }
 
     @Test
-    public void testParseWrongDelimiter() {
+    public void testParseWithEmptyFile() {
+        ArrayList<MetroStop> stops;
         try {
-            new Parser().parse("ratp_arret.csv", ";");
+            stops = new Parser().parse("ratp_arret_empty.csv", "#");
+            Assert.assertEquals(0, stops.size());
         } catch (Exception e) {
-            assert e instanceof NumberFormatException;
+            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -47,5 +50,23 @@ public class ParserTests extends TestCase {
         Assert.assertEquals(ms.stopName, "Abbesses");
         Assert.assertEquals(ms.districtName, "PARIS-18EME");
         Assert.assertEquals(ms.stopType, "metro");
+    }
+
+    @Test
+    public void testParseLineWithIncorrectLine() {
+        try {
+            new Parser().parseLine("1975#2.33871281165883#Abbesses#PARIS-18EME#metro", "#");
+        } catch (Exception e) {
+            assert e instanceof IllegalArgumentException;
+        }
+    }
+
+    @Test
+    public void testParseLineWrongDelimiter() {
+        try {
+            new Parser().parseLine("ratp_arret.csv", ";");
+        } catch (Exception e) {
+            assert e instanceof IllegalArgumentException;
+        }
     }
 }
