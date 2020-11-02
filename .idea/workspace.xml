@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="2daa3eb2-f527-47fb-81ce-a37a62ff8f10" name="Default Changelist" comment="" />
+    <list default="true" id="2daa3eb2-f527-47fb-81ce-a37a62ff8f10" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/TP4_Java/src/TP4.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -17,6 +19,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/TP4_Java" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -30,9 +33,10 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="421" y="82" key="FileChooserDialogImpl" timestamp="1602575153371">
+    <state x="421" y="82" key="FileChooserDialogImpl" timestamp="1604153365280">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
+    <state x="421" y="82" key="FileChooserDialogImpl/0.0.1280.680/1920.0.1920.1040@0.0.1280.680" timestamp="1604153365280" />
     <state x="421" y="82" key="FileChooserDialogImpl/0.0.1280.680@0.0.1280.680" timestamp="1602575153371" />
     <state x="91" y="0" key="new project wizard" timestamp="1602575165943">
       <screen x="0" y="0" width="1280" height="680" />
