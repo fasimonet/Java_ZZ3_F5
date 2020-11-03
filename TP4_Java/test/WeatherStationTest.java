@@ -6,7 +6,7 @@ public class WeatherStationTest extends TestCase {
     public void testBadCityName() {
         WeatherStation weatherStation = new WeatherStation();
         try {
-            weatherStation.GetCityWeather("city name which does not exist");
+            weatherStation.getCityWeather("city name which does not exist");
             fail("Call of GetCityWeather() method with bad city name should have fired an exception");
         } catch (IOException e) {
             assertNull(null);
@@ -17,7 +17,7 @@ public class WeatherStationTest extends TestCase {
         WeatherStation weatherStation = new WeatherStation();
         CityWeather cityWeather = null;
         try {
-            cityWeather = weatherStation.GetCityWeather("Clermont-Ferrand");
+            cityWeather = weatherStation.getCityWeather("Clermont-Ferrand");
         } catch (IOException e) {
             fail("Call of GetCityWeather() method with good city name should not have fired an exception");
         }

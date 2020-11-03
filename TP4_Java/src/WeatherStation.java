@@ -5,7 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class WeatherStation {
-    public CityWeather GetCityWeather(String cityName) throws IOException {
+    public CityWeather getCityWeather(String cityName) throws IOException {
         StringBuilder urlString = new StringBuilder();
         URL url = new URL(urlString.append("https://api.openweathermap.org/data/2.5/weather?q=").append(cityName).append("&appid=fdec5664d19caf22895d3aaf207d3d43&units=metric").toString());
 
