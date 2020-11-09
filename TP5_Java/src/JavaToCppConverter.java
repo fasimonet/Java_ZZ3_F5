@@ -1,22 +1,33 @@
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
+import static java.lang.System.lineSeparator;
+
 public class JavaToCppConverter {
-    public static void convertJavaToCppClass(String javaClassName, String cppClassName) throws ClassNotFoundException {
+    public static String convertJavaToCppClass(String javaClassName, String cppClassName) throws ClassNotFoundException {
+        StringBuilder cppClassContent = new StringBuilder();
+
         Map<String, ArrayList<String>> attributesMethodsAndConstructorsSortedByVisibility = new HashMap<>();
+        Map<String, ArrayList<String>> methodsSortedByVisibility = new HashMap<>();
+        Map<String, ArrayList<String>> constructorsSortedByVisibility = new HashMap<>();
         Set<String> dependencies = new HashSet<>();
-        Class java = Class.forName(javaClassName);
+        Class javaClass = Class.forName(javaClassName);
+        String classVisibility = Modifier.toString(javaClass.getModifiers());
 
-        retrieveAttributes(java, attributesMethodsAndConstructorsSortedByVisibility, dependencies);
-        retrieveMethods(java, attributesMethodsAndConstructorsSortedByVisibility, dependencies);
-        retrieveConstructors(java, attributesMethodsAndConstructorsSortedByVisibility, dependencies);
+        retrieveAttributes(javaClass, attributesMethodsAndConstructorsSortedByVisibility, dependencies);
+        retrieveMethodsPrototypes(javaClass, attributesMethodsAndConstructorsSortedByVisibility, methodsSortedByVisibility, dependencies);
+        retrieveConstructors(javaClass, attributesMethodsAndConstructorsSortedByVisibility, constructorsSortedByVisibility, dependencies);
 
-        displayGuardiansHeader(cppClassName);
-        displayDependencies(dependencies);
-        displayClass(cppClassName, attributesMethodsAndConstructorsSortedByVisibility);
-        displayGuardiansFooter();
+        buildGuardiansHeader(cppClassName, cppClassContent);
+        buildDependencies(dependencies, cppClassContent);
+        buildClass(cppClassName, classVisibility, attributesMethodsAndConstructorsSortedByVisibility, cppClassContent);
+        buildClassImplementation(cppClassName, methodsSortedByVisibility, constructorsSortedByVisibility, cppClassContent);
+        buildGuardiansFooter(cppClassContent);
+
+        return cppClassContent.toString();
     }
 
     // Convert Java String type to cpp std::string type
@@ -34,87 +45,166 @@ public class JavaToCppConverter {
     }
 
     // Retrieve attributes
-    private static void retrieveAttributes(Class javaClassType, Map<String, ArrayList<String>> content, Set<String> dependencies) {
+    private static void retrieveAttributes(Class javaClassType, Map<String, ArrayList<String>> attributesMethodsAndConstructorsSortedByVisibility, Set<String> dependencies) {
         for (Field attribute : javaClassType.getDeclaredFields()) {
             String splitedAttribute = attribute.toString().split(" ")[0];
             String attributesInCppString = convertJavaStringToCppString(attribute.toString().split(" ")[1], dependencies);
 
-            if (!content.containsKey(splitedAttribute)) {
-                content.put(splitedAttribute, new ArrayList<>());
+            if (!attributesMethodsAndConstructorsSortedByVisibility.containsKey(splitedAttribute)) {
+                attributesMethodsAndConstructorsSortedByVisibility.put(splitedAttribute, new ArrayList<>());
             }
-            content.get(splitedAttribute).add(new StringBuilder(attributesInCppString).append(" ").append(attribute.getName()).toString());
+            attributesMethodsAndConstructorsSortedByVisibility.get(splitedAttribute).add(new StringBuilder(attributesInCppString).append(" ").append(attribute.getName()).toString());
         }
     }
 
     // Retrieve Methods
-    private static void retrieveMethods(Class javaClassType, Map<String, ArrayList<String>> content, Set<String> dependencies) {
+    private static void retrieveMethodsPrototypes(Class javaClassType, Map<String, ArrayList<String>> attributesMethodsAndConstructorsSortedByVisibility, Map<String, ArrayList<String>> methodsSortedByVisibility, Set<String> dependencies) {
         for (Method method : javaClassType.getDeclaredMethods()) {
             String splitedMethod = method.toString().split(" ")[0];
             String methodsInCppString = convertJavaStringToCppString(method.toString().split(" ")[1], dependencies);
 
-            List<String> params = new ArrayList<>();
+            List<String> parametersTypes = new ArrayList<>();
+            List<String> parametersTypesAndNames = new ArrayList<>();
+
+            int cpt = 1;
+
             for (Class c : method.getParameterTypes()) {
-                params.add(convertJavaStringToCppString(c.getName(), dependencies));
+                String param = convertJavaStringToCppString(c.getName(), dependencies);
+
+                parametersTypes.add(param);
+                parametersTypesAndNames.add(param + " param" + cpt++);
             }
 
-            if (!content.containsKey(splitedMethod)) {
-                content.put(splitedMethod, new ArrayList<>());
+            if (!attributesMethodsAndConstructorsSortedByVisibility.containsKey(splitedMethod)) {
+                attributesMethodsAndConstructorsSortedByVisibility.put(splitedMethod, new ArrayList<>());
             }
-            content.get(splitedMethod).add(new StringBuilder(methodsInCppString).append(" ").append(method.getName()).append("(").append(String.join(", ", params)).append(")").toString());
+
+            if (!methodsSortedByVisibility.containsKey(splitedMethod)) {
+                methodsSortedByVisibility.put(splitedMethod, new ArrayList<>());
+            }
+
+            attributesMethodsAndConstructorsSortedByVisibility.get(splitedMethod).add(new StringBuilder(methodsInCppString).append(" ").append(method.getName()).append("(").append(String.join(", ", parametersTypes)).append(")").toString());
+            methodsSortedByVisibility.get(splitedMethod).add(new StringBuilder(methodsInCppString).append(" ").append(method.getName()).append("(").append(String.join(", ", parametersTypesAndNames)).append(")").toString());
         }
     }
 
     // Retrieve constructors
-    private static void retrieveConstructors(Class javaClass, Map<String, ArrayList<String>> attributesMethodsAndConstructorsSortedByVisibility, Set<String> dependencies) {
+    private static void retrieveConstructors(Class javaClass, Map<String, ArrayList<String>> attributesMethodsAndConstructorsSortedByVisibility, Map<String, ArrayList<String>> constructorsSortedByVisibility, Set<String> dependencies) {
         for (Constructor constructor : javaClass.getDeclaredConstructors()) {
             String javaConstructor = constructor.toString().split(" ")[0];
 
-            List<String> params = new ArrayList<>();
+            List<String> parametersTypes = new ArrayList<>();
+            List<String> parametersTypesAndNames = new ArrayList<>();
+
+            int cpt = 1;
+
             for (Class c : constructor.getParameterTypes()) {
-                params.add(convertJavaStringToCppString(c.getName(), dependencies));
+                String param = convertJavaStringToCppString(c.getName(), dependencies);
+
+                parametersTypes.add(param);
+                parametersTypesAndNames.add(param + " param" + cpt++);
             }
 
             if (!attributesMethodsAndConstructorsSortedByVisibility.containsKey(javaConstructor)) {
                 attributesMethodsAndConstructorsSortedByVisibility.put(javaConstructor, new ArrayList<>());
             }
-            attributesMethodsAndConstructorsSortedByVisibility.get(javaConstructor).add(new StringBuilder(constructor.getName()).append("(").append(String.join(", ", params)).append(")").toString());
+
+            if (!constructorsSortedByVisibility.containsKey(javaConstructor)) {
+                constructorsSortedByVisibility.put(javaConstructor, new ArrayList<>());
+            }
+
+            attributesMethodsAndConstructorsSortedByVisibility.get(javaConstructor).add(new StringBuilder(constructor.getName()).append("(").append(String.join(", ", parametersTypes)).append(")").toString());
+            constructorsSortedByVisibility.get(javaConstructor).add(new StringBuilder(constructor.getName()).append("(").append(String.join(", ", parametersTypesAndNames)).append(")").toString());
         }
     }
 
-    // Display the guardian header
-    public static void displayGuardiansHeader(String className) {
-        System.out.println(new StringBuilder("#ifndef ").append(className.toUpperCase()).append("_HPP"));
-        System.out.println(new StringBuilder("#define ").append(className.toUpperCase()).append("_HPP"));
-        System.out.println();
+    // Build the guardian header
+    public static void buildGuardiansHeader(String className, StringBuilder cppClassContent) {
+        cppClassContent.append("#ifndef ").append(className.toUpperCase()).append("_HPP").append(lineSeparator());
+        cppClassContent.append("#define ").append(className.toUpperCase()).append("_HPP").append(lineSeparator()).append(lineSeparator());
     }
 
-    // Display the dependencies
-    private static void displayDependencies(Set<String> dependencies) {
+    // Build the dependencies to include
+    private static void buildDependencies(Set<String> dependencies, StringBuilder cppClassContent) {
         for (String dependency : dependencies) {
-            System.out.println(new StringBuilder("#include <").append(dependency).append(">"));
+            cppClassContent.append("#include <").append(dependency).append(">").append(lineSeparator());
         }
-        System.out.println();
+        cppClassContent.append(System.lineSeparator());
     }
 
-    // Display the cpp class content
-    private static void displayClass(String cppClassName, Map<String, ArrayList<String>> attributesMethodsAndConstructorsSortedByVisibility) {
-        System.out.println(new StringBuilder("Class ").append(cppClassName).append(" {"));
+    private static void buildClass(String cppClassName, String classVisibility, Map<String, ArrayList<String>> attributesMethodsAndConstructorsSortedByVisibility, StringBuilder cppClassContent) {
+        cppClassContent.append(classVisibility).append(" ").append("class").append(" ").append(cppClassName).append(" {").append(lineSeparator());
 
         for (Map.Entry<String, ArrayList<String>> elementSorted : attributesMethodsAndConstructorsSortedByVisibility.entrySet()) {
-            // Display visibility
-            System.out.println(new StringBuilder("\t").append(elementSorted.getKey()).append(":"));
-            // Display attributes for this visibility
+            // Get visibility
+            cppClassContent.append("\t").append(elementSorted.getKey()).append(":").append(lineSeparator());
+
+            // Display attributes, methods and constructors for this visibility
             for (String method : elementSorted.getValue()) {
-                System.out.println(new StringBuilder("\t\t").append(method).append(";"));
+                cppClassContent.append("\t\t").append(method).append(";").append(lineSeparator());
             }
         }
 
-        System.out.println("}");
-        System.out.println();
+        cppClassContent.append("}").append(lineSeparator());
     }
 
-    // Display the guardian footer
-    public static void displayGuardiansFooter() {
-        System.out.println("#endif");
+    private static void buildClassImplementation(String cppClassName, Map<String, ArrayList<String>> methodsSortedByVisibility, Map<String, ArrayList<String>> constructorsSortedByVisibility, StringBuilder cppClassContent) {
+        cppClassContent.append(lineSeparator());
+
+        buildConstructorsImplementation(cppClassName, constructorsSortedByVisibility,cppClassContent);
+        buildMethodsImplementation(cppClassName, methodsSortedByVisibility, cppClassContent);
+    }
+
+    private static void buildMethodsImplementation(String cppClassName, Map<String, ArrayList<String>> methodsSortedByVisibility, StringBuilder cppClassContent) {
+        for (Map.Entry<String, ArrayList<String>> elementSorted : methodsSortedByVisibility.entrySet()) {
+            // Get visibility
+            cppClassContent.append(elementSorted.getKey()).append(" ");
+
+            // Display attributes, methods and constructors for this visibility
+            for (String method : elementSorted.getValue()) {
+                //cppClassContent.append(method).append(" {").append(lineSeparator());
+
+                String[] methodPrototype = method.split(" ");
+
+
+                String returnType = methodPrototype[0];
+                StringBuilder methodNameAndParameters = new StringBuilder();
+
+                for (int i=1; i<methodPrototype.length; ++i) {
+                    methodNameAndParameters.append(methodPrototype[i]).append(" ");
+                }
+
+                cppClassContent.append(returnType).append(" ").append(cppClassName).append("::").append(methodNameAndParameters).append(" {").append(lineSeparator());
+
+                if (returnType.compareTo("int") == 0 || returnType.compareTo("float") == 0 || returnType.compareTo("double") == 0 || returnType.compareTo("long") == 0 || returnType.compareTo("short") == 0 || returnType.compareTo("byte") == 0) {
+                    cppClassContent.append("\treturn 0;");
+                } else if (returnType.compareTo("boolean") == 0) {
+                    cppClassContent.append("\treturn true;");
+                } else if (returnType.compareTo("std::string") == 0) {
+                    cppClassContent.append("\treturn \"\";");
+                }
+
+                cppClassContent.append(lineSeparator()).append("}").append(lineSeparator()).append(lineSeparator());
+            }
+        }
+    }
+
+    private static void buildConstructorsImplementation(String cppClassName, Map<String, ArrayList<String>> constructorsSortedByVisibility, StringBuilder cppClassContent) {
+        for (Map.Entry<String, ArrayList<String>> elementSorted : constructorsSortedByVisibility.entrySet()) {
+            // Get visibility
+            cppClassContent.append(elementSorted.getKey()).append(" ");
+
+            // Display attributes, methods and constructors for this visibility
+            for (String method : elementSorted.getValue()) {
+                //cppClassContent.append(method).append(" {").append(lineSeparator());
+
+                cppClassContent.append(cppClassName).append("::").append(method).append(" {").append(lineSeparator());
+                cppClassContent.append(lineSeparator()).append("}").append(lineSeparator()).append(lineSeparator());
+            }
+        }
+    }
+
+    private static void buildGuardiansFooter(StringBuilder cppClassContent) {
+        cppClassContent.append("#endif").append(lineSeparator());
     }
 }
