@@ -144,7 +144,7 @@ public class JavaToCppConverter {
             }
         }
 
-        cppClassContent.append("}").append(lineSeparator());
+        cppClassContent.append("};").append(lineSeparator());
     }
 
     private static void buildClassImplementation(String cppClassName, Map<String, ArrayList<String>> methodsSortedByVisibility, Map<String, ArrayList<String>> constructorsSortedByVisibility, StringBuilder cppClassContent) {
@@ -176,7 +176,7 @@ public class JavaToCppConverter {
                     cppClassContent.append("\treturn \"\";");
                 }
 
-                cppClassContent.append(lineSeparator()).append("};").append(lineSeparator()).append(lineSeparator());
+                cppClassContent.append(lineSeparator()).append("}").append(lineSeparator()).append(lineSeparator());
             }
         }
     }

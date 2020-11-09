@@ -14,7 +14,7 @@ class Other {
 	protected:
 		float sum;
 		void calculateSum(float, float);
-}
+};
 
 Other::ClassToConvert(int param1, std::string param2, float param3) {
 
