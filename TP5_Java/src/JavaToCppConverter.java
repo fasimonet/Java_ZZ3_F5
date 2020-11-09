@@ -1,7 +1,6 @@
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.*;
 
 import static java.lang.System.lineSeparator;
@@ -18,7 +17,7 @@ public class JavaToCppConverter {
 
         retrieveAttributes(javaClass, attributesMethodsAndConstructorsSortedByVisibility, dependencies);
         retrieveMethodsPrototypes(javaClass, attributesMethodsAndConstructorsSortedByVisibility, methodsSortedByVisibility, dependencies);
-        retrieveConstructors(javaClass, attributesMethodsAndConstructorsSortedByVisibility, constructorsSortedByVisibility, dependencies);
+        retrieveConstructors(javaClass, attributesMethodsAndConstructorsSortedByVisibility, constructorsSortedByVisibility, dependencies, cppClassName);
 
         buildGuardiansHeader(cppClassName, cppClassContent);
         buildDependencies(dependencies, cppClassContent);
@@ -88,7 +87,7 @@ public class JavaToCppConverter {
     }
 
     // Retrieve constructors
-    private static void retrieveConstructors(Class javaClass, Map<String, ArrayList<String>> attributesMethodsAndConstructorsSortedByVisibility, Map<String, ArrayList<String>> constructorsSortedByVisibility, Set<String> dependencies) {
+    private static void retrieveConstructors(Class javaClass, Map<String, ArrayList<String>> attributesMethodsAndConstructorsSortedByVisibility, Map<String, ArrayList<String>> constructorsSortedByVisibility, Set<String> dependencies, String cppClassName) {
         for (Constructor constructor : javaClass.getDeclaredConstructors()) {
             String javaConstructor = constructor.toString().split(" ")[0];
 
@@ -112,8 +111,8 @@ public class JavaToCppConverter {
                 constructorsSortedByVisibility.put(javaConstructor, new ArrayList<>());
             }
 
-            attributesMethodsAndConstructorsSortedByVisibility.get(javaConstructor).add(new StringBuilder(constructor.getName()).append("(").append(String.join(", ", parametersTypes)).append(")").toString());
-            constructorsSortedByVisibility.get(javaConstructor).add(new StringBuilder(constructor.getName()).append("(").append(String.join(", ", parametersTypesAndNames)).append(")").toString());
+            attributesMethodsAndConstructorsSortedByVisibility.get(javaConstructor).add(new StringBuilder(cppClassName).append("(").append(String.join(", ", parametersTypes)).append(")").toString());
+            constructorsSortedByVisibility.get(javaConstructor).add(new StringBuilder(cppClassName).append("(").append(String.join(", ", parametersTypesAndNames)).append(")").toString());
         }
     }
 

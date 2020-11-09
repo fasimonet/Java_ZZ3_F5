@@ -10,13 +10,13 @@ class Other {
 	public:
 		int number;
 		std::string getName();
-		ClassToConvert(int, std::string, float);
+		Other(int, std::string, float);
 	protected:
 		float sum;
 		void calculateSum(float, float);
 };
 
-Other::ClassToConvert(int param1, std::string param2, float param3) {
+Other::Other(int param1, std::string param2, float param3) {
 
 }
 
