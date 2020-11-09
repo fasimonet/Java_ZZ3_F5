@@ -3,7 +3,7 @@
 
 #include <string>
 
-public class Other {
+class Other {
 	private:
 		std::string name;
 		int dummyMethod(int);
@@ -16,20 +16,20 @@ public class Other {
 		void calculateSum(float, float);
 }
 
-public Other::ClassToConvert(int param1, std::string param2, float param3) {
+Other::ClassToConvert(int param1, std::string param2, float param3) {
 
 }
 
-private int Other::dummyMethod(int param1)  {
+int Other::dummyMethod(int param1)  {
 	return 0;
 }
 
-protected void Other::calculateSum(float param1, float param2)  {
-
+std::string Other::getName()  {
+	return "";
 }
 
-public std::string Other::getName()  {
-	return "";
+void Other::calculateSum(float param1, float param2)  {
+
 }
 
 #endif

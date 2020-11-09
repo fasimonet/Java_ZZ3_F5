@@ -15,7 +15,6 @@ public class JavaToCppConverter {
         Map<String, ArrayList<String>> constructorsSortedByVisibility = new HashMap<>();
         Set<String> dependencies = new HashSet<>();
         Class javaClass = Class.forName(javaClassName);
-        String classVisibility = Modifier.toString(javaClass.getModifiers());
 
         retrieveAttributes(javaClass, attributesMethodsAndConstructorsSortedByVisibility, dependencies);
         retrieveMethodsPrototypes(javaClass, attributesMethodsAndConstructorsSortedByVisibility, methodsSortedByVisibility, dependencies);
@@ -23,7 +22,7 @@ public class JavaToCppConverter {
 
         buildGuardiansHeader(cppClassName, cppClassContent);
         buildDependencies(dependencies, cppClassContent);
-        buildClass(cppClassName, classVisibility, attributesMethodsAndConstructorsSortedByVisibility, cppClassContent);
+        buildClass(cppClassName, attributesMethodsAndConstructorsSortedByVisibility, cppClassContent);
         buildClassImplementation(cppClassName, methodsSortedByVisibility, constructorsSortedByVisibility, cppClassContent);
         buildGuardiansFooter(cppClassContent);
 
@@ -132,8 +131,8 @@ public class JavaToCppConverter {
         cppClassContent.append(System.lineSeparator());
     }
 
-    private static void buildClass(String cppClassName, String classVisibility, Map<String, ArrayList<String>> attributesMethodsAndConstructorsSortedByVisibility, StringBuilder cppClassContent) {
-        cppClassContent.append(classVisibility).append(" ").append("class").append(" ").append(cppClassName).append(" {").append(lineSeparator());
+    private static void buildClass(String cppClassName, Map<String, ArrayList<String>> attributesMethodsAndConstructorsSortedByVisibility, StringBuilder cppClassContent) {
+        cppClassContent.append("class").append(" ").append(cppClassName).append(" {").append(lineSeparator());
 
         for (Map.Entry<String, ArrayList<String>> elementSorted : attributesMethodsAndConstructorsSortedByVisibility.entrySet()) {
             // Get visibility
@@ -157,15 +156,8 @@ public class JavaToCppConverter {
 
     private static void buildMethodsImplementation(String cppClassName, Map<String, ArrayList<String>> methodsSortedByVisibility, StringBuilder cppClassContent) {
         for (Map.Entry<String, ArrayList<String>> elementSorted : methodsSortedByVisibility.entrySet()) {
-            // Get visibility
-            cppClassContent.append(elementSorted.getKey()).append(" ");
-
-            // Display attributes, methods and constructors for this visibility
             for (String method : elementSorted.getValue()) {
-                //cppClassContent.append(method).append(" {").append(lineSeparator());
-
                 String[] methodPrototype = method.split(" ");
-
 
                 String returnType = methodPrototype[0];
                 StringBuilder methodNameAndParameters = new StringBuilder();
@@ -191,13 +183,7 @@ public class JavaToCppConverter {
 
     private static void buildConstructorsImplementation(String cppClassName, Map<String, ArrayList<String>> constructorsSortedByVisibility, StringBuilder cppClassContent) {
         for (Map.Entry<String, ArrayList<String>> elementSorted : constructorsSortedByVisibility.entrySet()) {
-            // Get visibility
-            cppClassContent.append(elementSorted.getKey()).append(" ");
-
-            // Display attributes, methods and constructors for this visibility
             for (String method : elementSorted.getValue()) {
-                //cppClassContent.append(method).append(" {").append(lineSeparator());
-
                 cppClassContent.append(cppClassName).append("::").append(method).append(" {").append(lineSeparator());
                 cppClassContent.append(lineSeparator()).append("}").append(lineSeparator()).append(lineSeparator());
             }
