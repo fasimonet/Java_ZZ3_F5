@@ -176,7 +176,7 @@ public class JavaToCppConverter {
                     cppClassContent.append("\treturn \"\";");
                 }
 
-                cppClassContent.append(lineSeparator()).append("}").append(lineSeparator()).append(lineSeparator());
+                cppClassContent.append(lineSeparator()).append("};").append(lineSeparator()).append(lineSeparator());
             }
         }
     }
