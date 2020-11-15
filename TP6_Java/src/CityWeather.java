@@ -30,7 +30,7 @@ public class CityWeather {
         StringBuilder weatherSummary = new StringBuilder();
         return weatherSummary
                 .append("===== WEATHER SUMMARY =====\n")
-                .append("Identifiant : ").append(id).append("\n")
+                .append("Identifier : ").append(id).append("\n")
                 .append("City name : ").append(name).append("\n")
                 .append("Longitude : ").append(coord.lon).append("\n")
                 .append("Latitude : ").append(coord.lat).append("\n")

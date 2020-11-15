@@ -1,5 +1,4 @@
 import junit.framework.TestCase;
-import org.junit.Assert;
 import java.io.IOException;
 
 public class WeatherStationTest extends TestCase {
