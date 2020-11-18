@@ -22,17 +22,17 @@ public class ThreadedStudentGenerator {
         List<Thread> studentGeneratorThreadList = new LinkedList<>();
 
         // Create threads
-        for(int i=0; i<nbThread; ++i) {
-            studentGeneratorThreadList.add(new StudentGeneratorThread(studentList, listSize));
+        for (int i = 0; i < nbThread; ++i) {
+            studentGeneratorThreadList.add(new StudentGeneratorThread(studentList, listSize / nbThread));
         }
 
         // Start threads
-        for(int j=0; j<nbThread; ++j) {
+        for (int j = 0; j < nbThread; ++j) {
             studentGeneratorThreadList.get(j).start();
         }
 
         // Wait threads
-        for(int k=0; k<nbThread; ++k) {
+        for (int k = 0; k < nbThread; ++k) {
             studentGeneratorThreadList.get(k).join();
         }
 

@@ -6,10 +6,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class StudentGenerator {
+    private static Faker faker = new Faker();
+
     public static Student generateStudent() {
-        Faker faker = new Faker();
-        String[] fullName = faker.gameOfThrones().character().split(" ");
-        return new Student("1", fullName[0], fullName.length < 2 ? "Snow" : fullName[1], faker.date().birthday(), faker.address().fullAddress(), faker.gameOfThrones().quote());
+        return new Student("1", faker.name().firstName(), faker.name().lastName(), faker.date().birthday(), faker.address().fullAddress(), faker.lorem().paragraph());
     }
 
     public static List<Student> generateStudentList(int listSize) {

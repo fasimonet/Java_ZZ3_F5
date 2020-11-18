@@ -6,10 +6,10 @@ import java.util.List;
 public class TP7 {
     public static void main(String[] args) {
         // INITIALIZATION
-        List<Student> students = new ArrayList<>();
+        //List<Student> students = new ArrayList<>();
         double totExecutionTime = 0;
         int tryNb = 5;
-        int studentToGenerateNb = 150;
+        int studentToGenerateNb = 150000;
         final int nbThread = Runtime.getRuntime().availableProcessors();
 
         // GENERATION WITHOUT THREADS
@@ -17,11 +17,14 @@ public class TP7 {
 
         for(int i=0; i<tryNb; ++i) {
             long startTime = System.nanoTime();
-            students = StudentGenerator.generateStudentList(studentToGenerateNb);
+            //double startTime = System.currentTimeMillis();
+            StudentGenerator.generateStudentList(studentToGenerateNb);
             long endTime = System.nanoTime();
+            //double endTime = System.currentTimeMillis();
 
             double executionTime = (endTime - startTime) / 1000000000.0;
-            System.out.println("Execution time of the generation " + (i+1) + ": " + executionTime + "s");
+            //double executionTime = endTime - startTime / 1000.0;
+            //System.out.println("Execution time of the generation " + (i+1) + ": " + executionTime + "s");
 
             totExecutionTime += executionTime;
         }
@@ -33,11 +36,15 @@ public class TP7 {
         try {
             System.out.println("Generation of " + studentToGenerateNb + " students " + tryNb + " times with " + nbThread + " threads.");
             for(int i=0; i<tryNb; ++i) {
+                //double startTime = System.currentTimeMillis();
                 long startTime = System.nanoTime();
                 ThreadedStudentGenerator.generateStudentList(nbThread, studentToGenerateNb);
                 long endTime = System.nanoTime();
+                //double endTime = System.currentTimeMillis();
 
                 double executionTime = (endTime - startTime) / 1000000000.0;
+                //double executionTime = (endTime - startTime) / 1000.0;
+
                 System.out.println("Execution time of the threaded generation " + (i + 1) + ": " + executionTime + "s");
 
                 totExecutionTime += executionTime;
